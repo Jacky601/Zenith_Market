@@ -1,4 +1,3 @@
-import 'dart:async';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../data/local/favorites_storage.dart';
 import '../data/models/product.dart';
@@ -8,16 +7,20 @@ final favoritesStorageProvider = Provider<FavoritesStorage>((ref) {
   return FavoritesStorage();
 });
 
-class FavoritesNotifier extends AsyncNotifier<Set<String>> {
-  @override
-  FutureOr<Set<String>> build() async {
-    final storage = ref.watch(favoritesStorageProvider);
-    return storage.loadFavorites();
+class FavoritesNotifier extends StateNotifier<Set<String>> {
+  final FavoritesStorage _storage;
+
+  FavoritesNotifier(this._storage) : super({}) {
+    _loadInitial();
+  }
+
+  Future<void> _loadInitial() async {
+    final saved = await _storage.loadFavorites();
+    state = saved;
   }
 
   Future<void> toggleFavorite(String productId) async {
-    final currentSet = state.value ?? {};
-    final updatedSet = Set<String>.from(currentSet);
+    final updatedSet = Set<String>.from(state);
 
     if (updatedSet.contains(productId)) {
       updatedSet.remove(productId);
@@ -25,42 +28,27 @@ class FavoritesNotifier extends AsyncNotifier<Set<String>> {
       updatedSet.add(productId);
     }
 
-    state = AsyncData(updatedSet);
-
-    final storage = ref.read(favoritesStorageProvider);
-    await storage.saveFavorites(updatedSet);
+    state = updatedSet;
+    await _storage.saveFavorites(updatedSet);
   }
 
   bool isFavorite(String productId) {
-    return state.value?.contains(productId) ?? false;
+    return state.contains(productId);
   }
 }
 
 final favoritesNotifierProvider =
-    AsyncNotifierProvider<FavoritesNotifier, Set<String>>(FavoritesNotifier.new);
+    StateNotifierProvider<FavoritesNotifier, Set<String>>((ref) {
+  final storage = ref.watch(favoritesStorageProvider);
+  return FavoritesNotifier(storage);
+});
 
 /// Provider dérivé retournant les objets Product complets correspondant aux IDs favoris
 final favoriteProductsProvider = Provider<AsyncValue<List<Product>>>((ref) {
   final productsAsync = ref.watch(productsFutureProvider);
-  final favoriteIdsAsync = ref.watch(favoritesNotifierProvider);
+  final favoriteIds = ref.watch(favoritesNotifierProvider);
 
-  if (productsAsync.isLoading || favoriteIdsAsync.isLoading) {
-    return const AsyncLoading();
-  }
-
-  if (productsAsync.hasError) {
-    return AsyncError(productsAsync.error!, productsAsync.stackTrace!);
-  }
-
-  if (favoriteIdsAsync.hasError) {
-    return AsyncError(favoriteIdsAsync.error!, favoriteIdsAsync.stackTrace!);
-  }
-
-  final products = productsAsync.value ?? [];
-  final favoriteIds = favoriteIdsAsync.value ?? {};
-
-  final favProducts =
-      products.where((product) => favoriteIds.contains(product.id)).toList();
-
-  return AsyncData(favProducts);
+  return productsAsync.whenData((products) {
+    return products.where((product) => favoriteIds.contains(product.id)).toList();
+  });
 });

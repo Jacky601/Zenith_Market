@@ -1,10 +1,9 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../data/models/sort_option.dart';
 
-/// Notifier et Provider pour le mot-clé de recherche
-class SearchQueryNotifier extends Notifier<String> {
-  @override
-  String build() => '';
+/// Notifier pour le mot-clé de recherche
+class SearchQueryNotifier extends StateNotifier<String> {
+  SearchQueryNotifier() : super('');
 
   void setQuery(String query) {
     state = query;
@@ -16,12 +15,13 @@ class SearchQueryNotifier extends Notifier<String> {
 }
 
 final searchQueryProvider =
-    NotifierProvider<SearchQueryNotifier, String>(SearchQueryNotifier.new);
+    StateNotifierProvider<SearchQueryNotifier, String>((ref) {
+  return SearchQueryNotifier();
+});
 
-/// Notifier et Provider pour la catégorie sélectionnée (null = 'Tous')
-class SelectedCategoryNotifier extends Notifier<String?> {
-  @override
-  String? build() => null;
+/// Notifier pour la catégorie sélectionnée (null = 'Tous')
+class SelectedCategoryNotifier extends StateNotifier<String?> {
+  SelectedCategoryNotifier() : super(null);
 
   void selectCategory(String? category) {
     state = category;
@@ -29,13 +29,13 @@ class SelectedCategoryNotifier extends Notifier<String?> {
 }
 
 final selectedCategoryProvider =
-    NotifierProvider<SelectedCategoryNotifier, String?>(
-        SelectedCategoryNotifier.new);
+    StateNotifierProvider<SelectedCategoryNotifier, String?>((ref) {
+  return SelectedCategoryNotifier();
+});
 
-/// Notifier et Provider pour l'ordre de tri
-class SortByNotifier extends Notifier<SortOption> {
-  @override
-  SortOption build() => SortOption.featured;
+/// Notifier pour l'ordre de tri
+class SortByNotifier extends StateNotifier<SortOption> {
+  SortByNotifier() : super(SortOption.featured);
 
   void setSort(SortOption option) {
     state = option;
@@ -43,4 +43,6 @@ class SortByNotifier extends Notifier<SortOption> {
 }
 
 final sortByProvider =
-    NotifierProvider<SortByNotifier, SortOption>(SortByNotifier.new);
+    StateNotifierProvider<SortByNotifier, SortOption>((ref) {
+  return SortByNotifier();
+});

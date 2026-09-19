@@ -16,23 +16,30 @@ class CartState {
     return subtotal >= 50.0 ? 0.0 : 4.99;
   }
 
-  double get total => subtotal + shippingFee;
+  double get total =>
+      double.parse((subtotal + shippingFee).toStringAsFixed(2));
 
   int get totalItemCount =>
       items.fold(0, (count, item) => count + item.quantity);
 
   bool get isEmpty => items.isEmpty;
 
+  int getQuantity(String productId) {
+    try {
+      final item = items.firstWhere((it) => it.product.id == productId);
+      return item.quantity;
+    } catch (_) {
+      return 0;
+    }
+  }
+
   CartState copyWith({List<CartItem>? items}) {
     return CartState(items: items ?? this.items);
   }
 }
 
-class CartNotifier extends Notifier<CartState> {
-  @override
-  CartState build() {
-    return const CartState();
-  }
+class CartNotifier extends StateNotifier<CartState> {
+  CartNotifier() : super(const CartState());
 
   void addItem(Product product, {int quantity = 1}) {
     final existingIndex =
@@ -77,7 +84,7 @@ class CartNotifier extends Notifier<CartState> {
         if (item.quantity > 1) {
           updatedList.add(item.copyWith(quantity: item.quantity - 1));
         }
-        // Si la quantité était 1, on ne l'ajoute pas => suppression
+        // Si quantité == 1, l'article est supprimé
       } else {
         updatedList.add(item);
       }
@@ -101,4 +108,6 @@ class CartNotifier extends Notifier<CartState> {
 }
 
 final cartNotifierProvider =
-    NotifierProvider<CartNotifier, CartState>(CartNotifier.new);
+    StateNotifierProvider<CartNotifier, CartState>((ref) {
+  return CartNotifier();
+});

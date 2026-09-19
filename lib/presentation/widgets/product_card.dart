@@ -76,8 +76,8 @@ class _ProductCardState extends ConsumerState<ProductCard>
 
   @override
   Widget build(BuildContext context) {
-    final favoritesAsync = ref.watch(favoritesNotifierProvider);
-    final isFav = favoritesAsync.value?.contains(widget.product.id) ?? false;
+    final favoriteIds = ref.watch(favoritesNotifierProvider);
+    final isFav = favoriteIds.contains(widget.product.id);
 
     return Card(
       clipBehavior: Clip.antiAlias,

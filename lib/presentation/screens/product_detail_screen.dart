@@ -39,8 +39,8 @@ class _ProductDetailScreenState extends ConsumerState<ProductDetailScreen> {
   @override
   Widget build(BuildContext context) {
     final product = ref.watch(productByIdProvider(widget.productId));
-    final favoritesAsync = ref.watch(favoritesNotifierProvider);
-    final isFav = favoritesAsync.value?.contains(widget.productId) ?? false;
+    final favoriteIds = ref.watch(favoritesNotifierProvider);
+    final isFav = favoriteIds.contains(widget.productId);
 
     if (product == null) {
       return Scaffold(
