@@ -135,16 +135,3 @@ flutter run -d linux
 ```
 
 ---
-
-## 📝 Note pour le Reviewer (à copier pour la soumission)
-
-> **Note pour le reviewer :**
-> Bonjour,
-> Pour ce troisième projet centré sur le State Management avec Riverpod, j'ai développé l'application e-commerce **Zenith Market**.
-> 
-> Points forts mis en œuvre :
-> - **Riverpod 2.x/3.x maîtrisé** : 10 providers distincts (`FutureProvider`, `NotifierProvider`, `AsyncNotifierProvider`, providers dérivés et modificateur `family`), gestion rigoureuse des états `AsyncValue` (`loading`, `data`, `error`).
-> - **Architecture en couches claire** : séparation stricte entre `presentation` (écrans et composants réutilisables), `providers` (logique métier pure), `data` (modèles, persistance locale, repository avec FakeStore API + fallback local hors-ligne), et `core` (thème Material 3, navigation GoRouter avec `StatefulShellRoute`).
-> - **Fonctionnalités complètes** : catalogue responsive, recherche temps réel, filtres par catégorie, tri, panier dynamique avec calculs automatiques, système de favoris persisté dans `shared_preferences`, et profil utilisateur avec formulaire validé.
-> - **Bonus** : micro-animation interactive lors de l'ajout au panier et badge réactif sur l'onglet panier.
-> - **Tests automatisés** : suite de tests unitaires et de widgets exécutable via `flutter test` (100% passante, zéro avertissement `flutter analyze`).
